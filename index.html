@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Multi-Coin Candle Analyzer</title>
+
+  <style>
+    body {
+      background: #0f0f0f;
+      color: #ffffff;
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    input, button {
+      padding: 10px;
+      font-size: 16px;
+      margin-top: 10px;
+    }
+    button {
+      cursor: pointer;
+    }
+    .card {
+      border: 1px solid #333;
+      padding: 12px;
+      margin-top: 12px;
+      border-radius: 6px;
+    }
+    .green { color: #00ff88; }
+    .red { color: #ff4d4d; }
+  </style>
+</head>
+
+<body>
+
+<h2>Multi-Coin 1-Minute Candle Analyzer</h2>
+
+<p>Enter coins (max 5, comma separated):</p>
+<input id="pairs" value="BTCUSD,ETHUSD">
+
+<br>
+<button onclick="fetchCandles()">Fetch Closed Candles</button>
+
+<div id="output"></div>
+
+<script>
+async function fetchCandles() {
+  const pairs = document.getElementById("pairs").value;
+  const url =
+    "https://qxt1.onrender.com/multi-candle?pairs=" + pairs;
+
+  document.getElementById("output").innerHTML = "Loading...";
+
+  try {
+    const res = await fetch(url);
+    const data = await res.json();
+
+    let html = "";
+
+    for (const pair in data) {
+      const c = data[pair];
+      const colorClass = c.color === "green" ? "green" : "red";
+
+      html += `
+        <div class="card">
+          <h3>${pair}</h3>
+          <p class="${colorClass}">
+            Candle: ${c.color.toUpperCase()}
+          </p>
+          <p>Dominance: <b>${c.dominance}</b></p>
+          <p>Strength: ${c.strength}</p>
+          <p>Body: ${c.body}</p>
+          <p>Upper Wick: ${c.upper_wick}</p>
+          <p>Lower Wick: ${c.lower_wick}</p>
+        </div>
+      `;
+    }
+
+    document.getElementById("output").innerHTML = html;
+  } catch (err) {
+    document.getElementById("output").innerHTML =
+      "Error fetching data";
+  }
+}
+</script>
+
+</body>
+</html>
